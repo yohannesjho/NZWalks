@@ -8,10 +8,10 @@ namespace NZWalks.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class RegionController : ControllerBase
+    public class RegionsController : ControllerBase
     {
         private readonly NZWalksDbContext _context;
-        public RegionController(NZWalksDbContext dbContext)
+        public RegionsController(NZWalksDbContext dbContext)
         {
             _context = dbContext;
         }
@@ -50,5 +50,30 @@ namespace NZWalks.Api.Controllers
 
             return Ok(Region);
         }
+
+        [HttpPost]
+        public IActionResult Create([FromBody] RegionCreateRequestDto dto)
+        {
+            var RegionDomainModel = new Region()
+            {
+                Name = dto.Name,
+                Code = dto.Code,
+                RegionImgUrl = dto.RegionImgUrl,
+            };
+
+            _context.Regions.Add(RegionDomainModel);
+            _context.SaveChanges();
+
+            var RegionDto = new RegionDto()
+            {
+                Id = RegionDomainModel.Id,
+                Name = RegionDomainModel.Name,
+                RegionImgUrl = RegionDomainModel.RegionImgUrl
+            };
+
+            return CreatedAtAction(nameof(GetById), new { id = RegionDomainModel.Id }, RegionDto);
+
+        }
+        
     }
 }
